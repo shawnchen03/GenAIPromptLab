@@ -35,56 +35,56 @@ interface GeneratedImage {
 const BackgroundAnimation = () => (
   <div className="fixed inset-0 z-[-1] overflow-hidden">
     <div className="absolute inset-0 bg-[#030817]" />
-    <div className="absolute inset-0 bg-gradient-to-br from-[#00E5E5] to-[#FF9966] opacity-10" />
+    <div className="absolute inset-0 bg-gradient-to-br from-[#00E5E5] to-[#FF9966] opacity-20" />
     <motion.div
-      className="absolute inset-0"
+      className="absolute inset-0 pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{
-        opacity: [0.02, 0.05, 0.02],
+        opacity: [0.2, 0.4, 0.2],
         scale: [1, 1.1, 1],
-        rotate: [0, 5, 0],
       }}
-      transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
     >
       {[...Array(20)].map((_, i) => (
-        <div
+        <motion.div
           key={i}
           className="absolute rounded-full bg-[#00E5E5] blur-3xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            width: `${Math.random() * 200 + 50}px`,
-            height: `${Math.random() * 200 + 50}px`,
-            opacity: 0.03,
+            width: `${Math.random() * 400 + 200}px`,
+            height: `${Math.random() * 400 + 200}px`,
           }}
         />
       ))}
     </motion.div>
     <motion.div
-      className="absolute inset-0"
+      className="absolute inset-0 pointer-events-none"
       initial={{ opacity: 0 }}
       animate={{
-        opacity: [0.01, 0.03, 0.01],
+        opacity: [0.2, 0.3, 0.2],
         scale: [1, 1.05, 1],
-        rotate: [0, -3, 0],
       }}
-      transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
     >
       {[...Array(15)].map((_, i) => (
-        <div
+        <motion.div
           key={i}
           className="absolute rounded-full bg-[#FF9966] blur-2xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            width: `${Math.random() * 150 + 30}px`,
-            height: `${Math.random() * 150 + 30}px`,
-            opacity: 0.02,
+            width: `${Math.random() * 300 + 150}px`,
+            height: `${Math.random() * 300 + 150}px`,
           }}
         />
       ))}
     </motion.div>
-    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.005] mix-blend-overlay" />
+    <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('/noise.png')] bg-cover bg-no-repeat bg-center" />
   </div>
 )
 
