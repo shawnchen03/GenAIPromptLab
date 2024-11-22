@@ -32,61 +32,136 @@ interface GeneratedImage {
   prompt: string
 }
 
-const BackgroundAnimation = () => (
-  <div className="fixed inset-0 z-[-1] overflow-hidden">
-    <div className="absolute inset-0 bg-[#030817]" />
-    <div className="absolute inset-0 bg-gradient-to-br from-[#00E5E5] to-[#FF9966] opacity-20" />
-    <motion.div
-      className="absolute inset-0 pointer-events-none"
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: [0.2, 0.4, 0.2],
-        scale: [1, 1.1, 1],
-      }}
-      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-    >
-      {[...Array(20)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-[#00E5E5] blur-3xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            width: `${Math.random() * 400 + 200}px`,
-            height: `${Math.random() * 400 + 200}px`,
-          }}
-        />
-      ))}
-    </motion.div>
-    <motion.div
-      className="absolute inset-0 pointer-events-none"
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: [0.2, 0.3, 0.2],
-        scale: [1, 1.05, 1],
-      }}
-      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-    >
-      {[...Array(15)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-[#FF9966] blur-2xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            width: `${Math.random() * 300 + 150}px`,
-            height: `${Math.random() * 300 + 150}px`,
-          }}
-        />
-      ))}
-    </motion.div>
-    <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('/noise.png')] bg-cover bg-no-repeat bg-center" />
-  </div>
-)
+const BackgroundAnimation = React.memo(() => {
+  const cyanCircles = React.useMemo(() => 
+    [...Array(6)].map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() * 300 + 200,
+    })), []
+  );
+
+  const orangeCircles = React.useMemo(() => 
+    [...Array(4)].map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() * 250 + 150,
+    })), []
+  );
+
+  return (
+    <div className="fixed inset-0 z-[-1] overflow-hidden">
+      <div className="absolute inset-0 bg-[#030817]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#00E5E5] to-[#FF9966] opacity-20" />
+
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        animate={{
+          opacity: [0.2, 0.3, 0.2],
+          rotate: 360,
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear",
+          repeatType: "reverse",
+        }}
+      >
+        {cyanCircles.map((circle, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-[#00E5E5] blur-3xl"
+            style={{
+              top: circle.top,
+              left: circle.left,
+              width: circle.size,
+              height: circle.size,
+              opacity: 0.15,
+              willChange: 'transform',
+            }}
+          />
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        animate={{
+          opacity: [0.2, 0.25, 0.2],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "linear",
+          repeatType: "reverse",
+        }}
+      >
+        {orangeCircles.map((circle, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-[#FF9966] blur-2xl"
+            style={{
+              top: circle.top,
+              left: circle.left,
+              width: circle.size,
+              height: circle.size,
+              opacity: 0.15,
+              willChange: 'transform',
+            }}
+          />
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full"
+            animate={{
+              y: [0, -100],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: Math.random() * 2 + 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "linear",
+            }}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
+      </motion.div>
+
+      <motion.div
+        className="absolute inset-0 bg-gradient-radial from-transparent to-[#030817] opacity-50"
+        animate={{
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      />
+
+      <div 
+        className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('/noise.png')] bg-cover bg-no-repeat bg-center"
+        style={{ willChange: 'opacity' }}
+      />
+
+      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-[#030817] opacity-60" />
+    </div>
+  );
+});
+
+BackgroundAnimation.displayName = 'BackgroundAnimation';
 
 const CustomCursor = () => {
   const cursorRef = useRef<HTMLDivElement>(null)
