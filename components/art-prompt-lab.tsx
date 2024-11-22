@@ -167,7 +167,7 @@ const EnhancedSelect = ({ value, onValueChange, options, placeholder }: {
   )
 }
 
-const AestheticScoreVisualization = ({ scores }: { scores: Record<PromptType, number> }) => {
+const AestheticScoreVisualization = React.memo(({ scores }: { scores: Record<PromptType, number> }) => {
   const maxScore = Math.max(...Object.values(scores))
   const normalizedScores = Object.entries(scores).reduce((acc, [key, value]) => {
     acc[key as PromptType] = value / maxScore
@@ -220,7 +220,7 @@ const AestheticScoreVisualization = ({ scores }: { scores: Record<PromptType, nu
       </div>
     </div>
   )
-}
+})
 
 const GenerateButton = ({ onClick, isGenerating }: { onClick: () => void, isGenerating: boolean }) => {
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -320,6 +320,16 @@ const GenerateButton = ({ onClick, isGenerating }: { onClick: () => void, isGene
   )
 }
 
+const getImagePath = (type: PromptType, promptNumber: string) => {
+  const subfolder = Math.floor(Math.random() * 3) + 1  // Random 1, 2, or 3
+  const folderMap: Record<PromptType, string> = {
+    'base': 'base',
+    'with_artist': 'positive',
+    'without_artist': 'negative'
+  }
+  return `/Sample image/${folderMap[type]}/${subfolder}/image_${promptNumber}.png`
+}
+
 export function ArtPromptLabComponent() {
   const [selectedModel, setSelectedModel] = useState('')
   const [selectedBasePrompt, setSelectedBasePrompt] = useState('')
@@ -331,41 +341,47 @@ export function ArtPromptLabComponent() {
     without_artist: null,
   })
 
-  const handleGenerate = async () => {
-    if (!selectedBasePrompt || !selectedModel || !selectedArtist) {
-      console.log('Please select all options')
-      return
-    }
-
-    if (selectedModel !== 'sd' || selectedArtist !== 'Greg Rutkowski') {
-      console.log('This combination is not yet available')
-      return
-    }
-
-    setIsGenerating(true)
-    
-    const promptNumber = selectedBasePrompt
-    const newImages: Record<PromptType, GeneratedImage> = {
-      base: {
-        url: getImagePath('base', promptNumber),
-        aestheticScore: Math.random() * 10,
-        prompt: selectedBasePrompt
-      },
-      with_artist: {
-        url: getImagePath('with_artist', promptNumber),
-        aestheticScore: Math.random() * 10,
-        prompt: `${selectedBasePrompt} in the style of Greg Rutkowski`
-      },
-      without_artist: {
-        url: getImagePath('without_artist', promptNumber),
-        aestheticScore: Math.random() * 10,
-        prompt: `${selectedBasePrompt} without any specific artist style`
+  const handleGenerate = React.useCallback(async () => {
+    try {
+      if (!selectedBasePrompt || !selectedModel || !selectedArtist) {
+        throw new Error('Please select all options')
       }
-    }
 
-    setGeneratedImages(newImages)
-    setIsGenerating(false)
-  }
+      if (selectedModel !== 'sd' || selectedArtist !== 'Greg Rutkowski') {
+        throw new Error('This combination is not yet available')
+      }
+
+      setIsGenerating(true)
+      
+      const promptNumber = selectedBasePrompt
+      const imageSet = await getImageSetWithScores(promptNumber)
+
+      const newImages: Record<PromptType, GeneratedImage> = {
+        base: {
+          url: imageSet.imagePaths.base,
+          aestheticScore: imageSet.scores.base,
+          prompt: selectedBasePrompt
+        },
+        with_artist: {
+          url: imageSet.imagePaths.with_artist,
+          aestheticScore: imageSet.scores.with_artist,
+          prompt: `${selectedBasePrompt} in the style of Greg Rutkowski`
+        },
+        without_artist: {
+          url: imageSet.imagePaths.without_artist,
+          aestheticScore: imageSet.scores.without_artist,
+          prompt: `${selectedBasePrompt} without any specific artist style`
+        }
+      }
+
+      setGeneratedImages(newImages)
+    } catch (error) {
+      console.error('Generation failed:', error)
+      // Add user feedback here
+    } finally {
+      setIsGenerating(false)
+    }
+  }, [selectedBasePrompt, selectedModel, selectedArtist])
 
   return (
     <div className="min-h-screen text-white overflow-hidden">

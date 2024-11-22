@@ -33,6 +33,13 @@ const folderMap: Record<PromptType, string> = {
   'without_artist': 'negative'
 }
 
+// Add this interface at the top with other interfaces
+interface ExcelRow {
+  Filename: string;
+  'Aesthetic Score': number;
+  [key: string]: string | number;  // For any other columns
+}
+
 // Function to get score from Excel file
 export async function getScoreFromExcel(type: PromptType, subfolder: number, imageNumber: string) {
   try {
@@ -40,9 +47,9 @@ export async function getScoreFromExcel(type: PromptType, subfolder: number, ima
     const arrayBuffer = await response.arrayBuffer()
     const workbook = XLSX.read(arrayBuffer)
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    const data = XLSX.utils.sheet_to_json(worksheet)
+    const data = XLSX.utils.sheet_to_json(worksheet) as ExcelRow[]
     
-    const imageData = data.find((row: any) => row.Filename === `image_${imageNumber}.png`)
+    const imageData = data.find(row => row.Filename === `image_${imageNumber}.png`)
     return imageData ? imageData['Aesthetic Score'] : 0
   } catch (error) {
     console.error(`Error getting score for ${type}/${subfolder}/image_${imageNumber}:`, error)
